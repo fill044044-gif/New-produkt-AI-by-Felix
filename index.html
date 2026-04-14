@@ -1,0 +1,748 @@
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Внедрение новых блюд в сеть | Чек-лист + фокус-группа</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #2e241f;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 10% 20%, #fef7ed, #f2e8db);
+      overflow: hidden;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 52px 64px 88px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0.45s;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 10;
+    }
+    .slide::-webkit-scrollbar {
+      width: 6px;
+    }
+    .slide::-webkit-scrollbar-track {
+      background: rgba(90,62,43,0.1);
+      border-radius: 10px;
+    }
+    .slide::-webkit-scrollbar-thumb {
+      background: #8b1e1e;
+      border-radius: 10px;
+    }
+    .topline {
+      display: inline-block;
+      align-self: flex-start;
+      background: #5a3e2b;
+      color: #fef0e0;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 40px;
+      letter-spacing: 0.4px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    h1 {
+      font-size: 3.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #261e16;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #2a1f17;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.01em;
+    }
+    .subtitle {
+      font-size: 1.2rem;
+      line-height: 1.5;
+      color: #4f443b;
+      max-width: 85%;
+      margin-bottom: 1.8rem;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      width: 100%;
+      margin: 20px 0 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin: 20px 0;
+    }
+    .card {
+      background: rgba(255, 248, 240, 0.85);
+      backdrop-filter: blur(2px);
+      border-radius: 32px;
+      padding: 1.6rem;
+      border: 1px solid rgba(90, 62, 43, 0.12);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+      transition: transform 0.25s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 40px rgba(90, 62, 43, 0.12);
+      background: rgba(255, 252, 245, 0.95);
+    }
+    .card h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #3a2a1e;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    ul {
+      list-style: none;
+    }
+    li {
+      margin-bottom: 0.8rem;
+      padding-left: 28px;
+      position: relative;
+      font-size: 1rem;
+      line-height: 1.45;
+      color: #2f2a25;
+    }
+    li i {
+      position: absolute;
+      left: 0;
+      top: 0.2rem;
+      color: #8b1e1e;
+      font-size: 1rem;
+      width: 20px;
+    }
+    .accent-box {
+      background: #5a3e2b;
+      color: #fff3e6;
+      padding: 1.2rem 1.8rem;
+      border-radius: 28px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-top: 24px;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .metric {
+      background: #fff;
+      border-radius: 28px;
+      padding: 1.4rem;
+      text-align: center;
+      transition: all 0.2s;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .metric .num {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #8b1e1e;
+      margin-bottom: 8px;
+    }
+    .metric .label {
+      font-size: 0.9rem;
+      color: #4a3e35;
+      font-weight: 500;
+    }
+    .process-steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 28px 0 12px;
+    }
+    .step-item {
+      flex: 1;
+      min-width: 130px;
+      background: rgba(255,255,245,0.7);
+      backdrop-filter: blur(4px);
+      border-radius: 28px;
+      padding: 18px 12px;
+      text-align: center;
+      transition: all 0.2s;
+      border: 1px solid rgba(90,62,43,0.1);
+      cursor: pointer;
+    }
+    .step-item:hover {
+      background: #fff3e8;
+      transform: scale(0.98);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+    }
+    .step-icon {
+      font-size: 2rem;
+      color: #8b1e1e;
+      margin-bottom: 12px;
+    }
+    .step-title {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #392c21;
+    }
+    .step-desc {
+      font-size: 0.75rem;
+      color: #6a5a4e;
+      margin-top: 6px;
+    }
+    .img-holder {
+      border-radius: 28px;
+      overflow: hidden;
+      height: 100%;
+      min-height: 200px;
+      background: #e7ddd0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    }
+    .img-holder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .img-holder img:hover {
+      transform: scale(1.02);
+    }
+    .calc-panel {
+      background: #2e241f;
+      border-radius: 28px;
+      padding: 20px;
+      color: white;
+      margin-top: 20px;
+    }
+    .calc-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .calc-field {
+      flex: 1;
+    }
+    .calc-field label {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      display: block;
+    }
+    .calc-field input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 60px;
+      border: none;
+      font-weight: 700;
+      margin-top: 6px;
+      font-size: 1rem;
+    }
+    .result-box {
+      background: #00000030;
+      border-radius: 24px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .result-card {
+      background: #fff2e6;
+      color: #2e241f;
+      border-radius: 20px;
+      padding: 12px 20px;
+      text-align: center;
+      flex: 1;
+      font-weight: 800;
+    }
+    /* чек-лист стили */
+    .checklist {
+      background: #ffffffd9;
+      border-radius: 32px;
+      padding: 24px;
+      margin: 20px 0;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+    }
+    .checklist h3 {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      color: #2e241f;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+      background: #fef7ef;
+      padding: 10px 18px;
+      border-radius: 60px;
+      border: 1px solid #e2d5ca;
+    }
+    .check-item label {
+      font-weight: 500;
+      color: #2c241e;
+      flex: 1;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .check-item input {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: #8b1e1e;
+    }
+    .focus-group-note {
+      background: #5a3e2b20;
+      border-left: 5px solid #8b1e1e;
+      padding: 12px 18px;
+      border-radius: 24px;
+      margin: 20px 0;
+      font-weight: 500;
+    }
+    .email-btn {
+      background: #8b1e1e;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .email-btn:hover {
+      background: #5a3e2b;
+      transform: scale(0.97);
+    }
+    .footer {
+      position: absolute;
+      bottom: 24px;
+      left: 64px;
+      right: 64px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 20;
+    }
+    .progress {
+      flex: 1;
+      height: 6px;
+      background: rgba(90,62,43,0.2);
+      border-radius: 10px;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #b54a2c, #5a3e2b);
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+    .page {
+      font-weight: 700;
+      color: #5c4b3b;
+    }
+    .controls {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 30;
+    }
+    .btn {
+      background: #2e241f;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 60px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    }
+    .btn:hover {
+      background: #8b1e1e;
+      transform: scale(0.96);
+    }
+    .pill {
+      background: #fff;
+      border-radius: 60px;
+      padding: 8px 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    @media (max-width: 1000px) {
+      .slide { padding: 30px 24px 90px; }
+      h1 { font-size: 2.5rem; }
+      h2 { font-size: 1.8rem; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 20px; }
+      .process-steps { flex-direction: column; }
+      .subtitle { max-width: 100%; }
+      .footer { left: 24px; right: 24px; }
+    }
+  </style>
+</head>
+<body>
+<div class="deck">
+  <!-- Слайд 1 - обложка (без изменений) -->
+  <section class="slide active">
+    <div class="topline"><i class="fas fa-utensils" style="margin-right: 6px;"></i> Управленческая презентация</div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 30px; flex:1;">
+      <div style="flex: 1.4;">
+        <h1>Система ввода новых блюд в сеть из 5 заведений</h1>
+        <div class="subtitle">Практический регламент для сети столовых и кафе с линией раздачи. Внедряем новинки системно, прибыльно и без потери качества.</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 28px;">
+          <span class="pill"><i class="fas fa-map-marker-alt"></i> Кострома</span>
+          <span class="pill"><i class="fas fa-store"></i> 5 точек</span>
+          <span class="pill"><i class="fas fa-chart-line"></i> Эконом → бизнес</span>
+          <span class="pill"><i class="fas fa-people-arrows"></i> Линия раздачи</span>
+        </div>
+        <div class="accent-box"><i class="fas fa-rocket" style="font-size: 1.6rem;"></i> Не просто запускаем блюда — строим управляемую систему роста выручки, маржи и качества.</div>
+      </div>
+      <div class="img-holder" style="flex: 0.8; min-width: 220px;">
+        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&h=500&fit=crop" alt="аппетитное блюдо">
+      </div>
+    </div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">1 / 13</div></div>
+  </section>
+
+  <!-- Слайд 2 - проблема -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-exclamation-triangle"></i> Почему это важно</div>
+    <h2>Проблема большинства сетей — хаотичный ввод новинок</h2>
+    <div class="grid-2">
+      <div class="card"><h3><i class="fas fa-skull-crosswalk"></i> Что происходит без системы</h3><ul><li><i class="fas fa-user-friends"></i> Блюда вводятся по вкусу отдельных людей</li><li><i class="fas fa-dice-d6"></i> Разный продукт на точках</li><li><i class="fas fa-clock"></i> Не выдерживают поток и линию раздачи</li><li><i class="fas fa-chart-simple"></i> Себестоимость вскрывается после запуска</li></ul></div>
+      <div class="card"><h3><i class="fas fa-chart-line"></i> К чему приводит</h3><ul><li><i class="fas fa-coins"></i> Потери маржи + рост фудкоста</li><li><i class="fas fa-chart-line"></i> Слабые продажи новинок</li><li><i class="fas fa-fire"></i> Перегруз кухни и персонала</li><li><i class="fas fa-balance-scale"></i> Нестабильное качество в сети</li></ul></div>
+    </div>
+    <div class="accent-box"><i class="fas fa-brain"></i> Новая система нужна не ради порядка, а ради предсказуемой прибыли на масштабе сети.</div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">2 / 13</div></div>
+  </section>
+
+  <!-- Слайд 3 - Регламент 10 шагов (интерактив) -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-map-signs"></i> Управленческое решение</div>
+    <h2>Единый регламент запуска новых блюд</h2>
+    <div class="subtitle">Каждая новинка проходит путь: от идеи до «масштабировать / доработать / убрать»</div>
+    <div class="process-steps" id="stepsContainer">
+      <div class="step-item" data-step="1"><div class="step-icon"><i class="fas fa-chart-pie"></i></div><div class="step-title">Стратегия</div><div class="step-desc">Выбор под формат</div></div>
+      <div class="step-item" data-step="2"><div class="step-icon"><i class="fas fa-clipboard-list"></i></div><div class="step-title">Рецептура</div><div class="step-desc">ТТК, эталон вкуса</div></div>
+      <div class="step-item" data-step="3"><div class="step-icon"><i class="fas fa-coins"></i></div><div class="step-title">Экономика</div><div class="step-desc">Себестоимость, маржа</div></div>
+      <div class="step-item" data-step="4"><div class="step-icon"><i class="fas fa-kitchen-set"></i></div><div class="step-title">Производство</div><div class="step-desc">Адаптация под кухни</div></div>
+      <div class="step-item" data-step="5"><div class="step-icon"><i class="fas fa-truck"></i></div><div class="step-title">Закупки</div><div class="step-desc">Поставщики, аналоги</div></div>
+      <div class="step-item" data-step="6"><div class="step-icon"><i class="fas fa-flask"></i></div><div class="step-title">Тест</div><div class="step-desc">Пилот, обратная связь</div></div>
+      <div class="step-item" data-step="7"><div class="step-icon"><i class="fas fa-chalkboard-user"></i></div><div class="step-title">Обучение</div><div class="step-desc">Инструкции, фото</div></div>
+      <div class="step-item" data-step="8"><div class="step-icon"><i class="fas fa-play"></i></div><div class="step-title">Запуск</div><div class="step-desc">Внедрение на 5 точках</div></div>
+      <div class="step-item" data-step="9"><div class="step-icon"><i class="fas fa-chart-simple"></i></div><div class="step-title">Продажи</div><div class="step-desc">Позиционирование</div></div>
+      <div class="step-item" data-step="10"><div class="step-icon"><i class="fas fa-magnifying-glass-chart"></i></div><div class="step-title">Аналитика</div><div class="step-desc">Решение по судьбе блюда</div></div>
+    </div>
+    <div id="stepMessage" style="margin-top: 12px; font-size: 0.85rem; color:#5e4b3a; background: #f2e5d8; border-radius: 40px; padding: 8px 16px; display: inline-block;"><i class="fas fa-hand-point-right"></i> Нажми на любой шаг, чтобы узнать подробнее</div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">3 / 13</div></div>
+  </section>
+
+  <!-- Слайд 4 - стратегия -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-chess-board"></i> Этап 1</div>
+    <div style="display: flex; gap: 32px; flex-wrap: wrap; flex:1;">
+      <div style="flex:1"><h2>Стратегия и выбор блюда</h2><div class="card"><h3><i class="fas fa-check-circle"></i> Проверяем до разработки</h3><ul><li><i class="fas fa-chart-line"></i> Подходит ли под сегмент: эконом / средний / бизнес</li><li><i class="fas fa-people-arrows"></i> Понятно ли гостю в Костроме</li><li><i class="fas fa-stopwatch"></i> Работает ли на линии раздачи</li><li><i class="fas fa-code-branch"></i> Масштабирование на 5 точек</li></ul></div></div>
+      <div class="img-holder" style="flex:0.8"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop" alt="стратегия еда"></div>
+    </div>
+    <div class="accent-box"><i class="fas fa-lightbulb"></i> Принцип: сначала формат и экономика сети, потом креатив.</div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">4 / 13</div></div>
+  </section>
+
+  <!-- Слайд 5 - стандартизация -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-ruler-combined"></i> Этап 2</div>
+    <h2>Разработка рецептуры и стандартизация</h2>
+    <div class="grid-2">
+      <div class="card"><h3><i class="fas fa-file-alt"></i> Что обязательно</h3><ul><li><i class="fas fa-book-open"></i> Полная ТТК</li><li><i class="fas fa-camera"></i> Фото эталонной подачи</li><li><i class="fas fa-ban"></i> Никаких "на глаз"</li></ul></div>
+      <div class="card"><h3><i class="fas fa-layer-group"></i> Вариативность по сегментам</h3><ul><li><i class="fas fa-leaf"></i> Эконом: доступное сырьё</li><li><i class="fas fa-chart-line"></i> Средний: баланс</li><li><i class="fas fa-gem"></i> Бизнес: усиленная подача</li></ul></div>
+    </div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">5 / 13</div></div>
+  </section>
+
+  <!-- Слайд 6 - юнит-экономика (изменён ориентир фудкоста 25-30%) -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-calculator"></i> Этап 3</div>
+    <h2>Юнит-экономика: запуск только через цифры</h2>
+    <div class="grid-3">
+      <div class="metric"><div class="num">100%</div><div class="label">новинок считаются до запуска</div></div>
+      <div class="metric"><div class="num">25–30%</div><div class="label">рабочий ориентир фудкоста для горячих блюд</div></div>
+      <div class="metric"><div class="num">≤5–7%</div><div class="label">целевой предел списаний по новой позиции</div></div>
+    </div>
+    <!-- Интерактивный калькулятор маржи -->
+    <div class="calc-panel">
+      <div style="display: flex; gap: 12px; align-items: center;"><i class="fas fa-chart-line" style="font-size: 1.8rem;"></i> <span style="font-weight: 700;">Калькулятор маржи блюда</span></div>
+      <div class="calc-row">
+        <div class="calc-field"><label>Себестоимость порции (₽)</label><input type="number" id="costPrice" value="95" step="5"></div>
+        <div class="calc-field"><label>Цена продажи (₽)</label><input type="number" id="sellPrice" value="220" step="10"></div>
+      </div>
+      <div class="result-box">
+        <div class="result-card"><span>Маржа, ₽</span><br><strong id="marginRub">125</strong></div>
+        <div class="result-card"><span>Маржа, %</span><br><strong id="marginPercent">56.8%</strong></div>
+        <div class="result-card"><span>Фудкост, %</span><br><strong id="foodCostPercent">43.2%</strong></div>
+      </div>
+      <div class="mini-note" style="color:#ddcfc2; margin-top: 12px;"><i class="fas fa-info-circle"></i> Меняй цифры — видишь влияние на экономику. Целевой фудкост 25-30%</div>
+    </div>
+    <div class="accent-box"><i class="fas fa-chart-simple"></i> Правило: блюдо без понятной маржи не масштабируется.</div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">6 / 13</div></div>
+  </section>
+
+  <!-- Слайд 7 - производство и закупки -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-industry"></i> Этап 4–5</div>
+    <div class="grid-2" style="align-items: stretch;">
+      <div class="card"><h3><i class="fas fa-gear"></i> Производство</h3><ul><li><i class="fas fa-check-circle"></i> Готовится ли на всех кухнях</li><li><i class="fas fa-arrows-spin"></i> Заготовочный цех</li><li><i class="fas fa-clock"></i> Время доготовки</li></ul></div>
+      <div class="card"><h3><i class="fas fa-boxes"></i> Закупки</h3><ul><li><i class="fas fa-truck-fast"></i> Не менее 2 поставщиков</li><li><i class="fas fa-code-branch"></i> Унификация с текущим меню</li><li><i class="fas fa-chart-line"></i> Стабильность цены</li></ul></div>
+    </div>
+    <div class="img-holder" style="margin-top: 12px;"><img src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&h=200&fit=crop" style="height: 160px;" alt="кухня"></div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">7 / 13</div></div>
+  </section>
+
+  <!-- Слайд 8 тестирование -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-vial"></i> Этап 6</div>
+    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+      <div style="flex:1"><h2>Тестирование перед масштабированием</h2><div class="card"><ul><li><i class="fas fa-people-tasting"></i> Внутренняя дегустация</li><li><i class="fas fa-chart-line"></i> Пилот в 1–2 точках</li><li><i class="fas fa-clipboard-list"></i> Сбор обратной связи</li></ul></div></div>
+      <div class="img-holder" style="flex:0.8"><img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400&h=280&fit=crop" alt="дегустация"></div>
+    </div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">8 / 13</div></div>
+  </section>
+
+  <!-- Слайд 9 обучение и запуск -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-graduation-cap"></i> Этап 7–8</div>
+    <div class="grid-2">
+      <div class="card"><h3><i class="fas fa-chalkboard"></i> Обучение</h3><ul><li>Пошаговые инструкции</li><li>Фото стандарта</li><li>Презентация новинки</li></ul></div>
+      <div class="card"><h3><i class="fas fa-flag-checkered"></i> Запуск в сеть</h3><ul><li>Внедрение волнами</li><li>Ответственные по этапам</li><li>Контроль ТТК</li></ul></div>
+    </div>
+    <div class="accent-box"><i class="fas fa-clipboard"></i> Персонал не должен «догадаться сам». Стандарты + контроль</div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">9 / 13</div></div>
+  </section>
+
+  <!-- Слайд 10 маркетинг -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-bullhorn"></i> Этап 9</div>
+    <div style="display: flex; gap: 28px; flex-wrap: wrap;"><div style="flex:1"><h2>Маркетинг и продажи на линии раздачи</h2><div class="card"><ul><li><i class="fas fa-eye"></i> Сильный визуал на линии</li><li><i class="fas fa-tag"></i> Комбо и связки</li><li><i class="fas fa-microphone-alt"></i> Продающие фразы персонала</li></ul></div></div>
+    <div class="img-holder" style="flex:0.8"><img src="https://images.unsplash.com/photo-1581299894007-aaa50297cf16?w=400&h=280&fit=crop" alt="линия раздачи"></div></div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">10 / 13</div></div>
+  </section>
+
+  <!-- Слайд 11 аналитика -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-chart-pie"></i> Этап 10</div>
+    <h2>Контроль и аналитика после запуска</h2>
+    <div class="grid-3">
+      <div class="metric"><div class="num"><i class="fas fa-chart-line"></i> Продажи</div><div class="label">штук / доля в категории</div></div>
+      <div class="metric"><div class="num"><i class="fas fa-rotate-left"></i> Оборот</div><div class="label">оборачиваемость сырья</div></div>
+      <div class="metric"><div class="num"><i class="fas fa-trash-alt"></i> Списания</div><div class="label">фактический % потерь</div></div>
+    </div>
+    <div class="accent-box"><i class="fas fa-chart-simple"></i> Цель контроля — быстро принять выгодное решение: оставить / доработать / убрать.</div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">11 / 13</div></div>
+  </section>
+
+  <!-- Слайд 12 итог -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-medal"></i> Итог</div>
+    <h2>Что получает сеть после внедрения регламента</h2>
+    <div class="grid-3">
+      <div class="metric"><div class="num"><i class="fas fa-bolt"></i> +</div><div class="label">Быстрый управляемый запуск</div></div>
+      <div class="metric"><div class="num"><i class="fas fa-equals"></i></div><div class="label">Стабильный вкус на 5 точках</div></div>
+      <div class="metric"><div class="num"><i class="fas fa-arrow-trend-up"></i></div><div class="label">Рост маржи и снижение списаний</div></div>
+    </div>
+    <div class="card" style="margin-top: 16px;"><h3><i class="fas fa-check-double"></i> Финальная позиция</h3><ul><li><i class="fas fa-cogs"></i> Внедряем систему управления новинками</li><li><i class="fas fa-chart-line"></i> Снижение ошибок + предсказуемый результат</li><li><i class="fas fa-chart-line"></i> Рост прибыли вместо хаоса</li></ul></div>
+    <div class="accent-box"><i class="fas fa-star-of-life"></i> Главный тезис: новые блюда должны усиливать сеть, а не создавать операционные проблемы.</div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">12 / 13</div></div>
+  </section>
+
+  <!-- Слайд 13 - ИНТЕРАКТИВНЫЙ ЧЕК-ЛИСТ С ФОКУС-ГРУППОЙ И ОТПРАВКОЙ НА EMAIL -->
+  <section class="slide">
+    <div class="topline"><i class="fas fa-clipboard-list"></i> Чек-лист запуска блюда</div>
+    <h2>Готовность к внедрению новинки</h2>
+    <div class="checklist">
+      <h3><i class="fas fa-check-square"></i> Отметьте выполненные этапы</h3>
+      <div class="check-item"><input type="checkbox" id="ch1"> <label for="ch1">📄 Разработана полная ТТК и эталонная фотография</label></div>
+      <div class="check-item"><input type="checkbox" id="ch2"> <label for="ch2">💰 Рассчитана себестоимость, цена, маржа (фудкост 25-30%)</label></div>
+      <div class="check-item"><input type="checkbox" id="ch3"> <label for="ch3">🏭 Проверена технологическая возможность на всех 5 кухнях</label></div>
+      <div class="check-item"><input type="checkbox" id="ch4"> <label for="ch4">🚚 Найден 2+ поставщика ключевых ингредиентов</label></div>
+      <div class="check-item"><input type="checkbox" id="ch5"> <label for="ch5">🧪 Проведен пилот в 1-2 точках, собрана обратная связь</label></div>
+      <div class="focus-group-note">
+        <i class="fas fa-users" style="margin-right: 10px; color:#8b1e1e;"></i> 
+        <strong>⭐ Обязательно: фокус-группа дегустации из 5 независимых человек</strong><br>
+        <span style="font-size:0.85rem;">(не сотрудники сети) — оценка вкуса, внешнего вида, желания покупать. Результаты зафиксированы.</span>
+        <div class="check-item" style="margin-top: 10px; background: #f2e1d4;"><input type="checkbox" id="chFocus"> <label for="chFocus" style="font-weight: bold;"><i class="fas fa-star"></i> Дегустация фокус-группой (5 чел) проведена, протокол готов</label></div>
+      </div>
+      <div class="check-item"><input type="checkbox" id="ch6"> <label for="ch6">👨‍🍳 Проведено обучение поваров (инструктаж, чек-листы)</label></div>
+      <div class="check-item"><input type="checkbox" id="ch7"> <label for="ch7">📢 Подготовлено маркетинговое позиционирование (ценник, комбо, фразы)</label></div>
+      <div class="check-item"><input type="checkbox" id="ch8"> <label for="ch8">📊 Назначены ответственные за контроль продаж и списаний в первую неделю</label></div>
+      
+      <div style="margin-top: 28px;">
+        <label style="font-weight: 600;"><i class="fas fa-pen"></i> Комментарий / примечание к запуску:</label><br>
+        <textarea id="checklistComment" rows="2" style="width: 100%; border-radius: 24px; padding: 12px; margin-top: 8px; border: 1px solid #ccc; font-family: inherit;"></textarea>
+      </div>
+      <button class="email-btn" id="sendReportBtn"><i class="fas fa-paper-plane"></i> Отправить отчет на e-mail: pirogi44@mail.ru</button>
+      <div id="sendMessage" style="margin-top: 14px; font-size: 0.85rem; color: #2e6b2e;"></div>
+    </div>
+    <div class="accent-box"><i class="fas fa-envelope"></i> После заполнения чек-листа нажмите «Отправить» — отчет придет на почту руководителю сети.</div>
+    <div class="footer"><div class="progress"><div class="progress-bar"></div></div><div class="page">13 / 13</div></div>
+  </section>
+</div>
+
+<div class="controls">
+  <button class="btn" onclick="prevSlide()"><i class="fas fa-arrow-left"></i> Назад</button>
+  <button class="btn" onclick="nextSlide()">Вперёд <i class="fas fa-arrow-right"></i></button>
+</div>
+
+<script>
+  // навигация
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+  function updateSlides() {
+    slides.forEach((s, idx) => {
+      if(idx === current) s.classList.add('active');
+      else s.classList.remove('active');
+    });
+    const progBars = document.querySelectorAll('.progress-bar');
+    progBars.forEach(bar => {
+      if(bar) bar.style.width = `${((current+1) / slides.length)*100}%`;
+    });
+  }
+  window.nextSlide = () => { current = (current+1) % slides.length; updateSlides(); };
+  window.prevSlide = () => { current = (current-1+slides.length)%slides.length; updateSlides(); };
+  document.addEventListener('keydown', e => {
+    if(e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') nextSlide();
+    if(e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+  });
+
+  // интерактив шагов (слайд 3)
+  const steps = document.querySelectorAll('.step-item');
+  const stepMsgDiv = document.getElementById('stepMessage');
+  const stepDetails = {
+    1: '📊 Стратегия: анализ трафика, соответствие концепции, матрица меню.',
+    2: '📝 Разработка ТТК, взвешивание, эталонные фото, проверка на повторяемость.',
+    3: '💰 Расчет себестоимости, цены, маржи, фудкоста, точки безубыточности.',
+    4: '🍳 Адаптация под реальные кухни: оборудование, время, поток.',
+    5: '🚚 Обеспечение 2+ поставщиков, унификация ингредиентов.',
+    6: '🧪 Дегустация + пилот на 1-2 точках, сбор отзывов от гостей и кухни.',
+    7: '📚 Обучение поваров, чек-листы, видео-инструкции, контроль навыков.',
+    8: '🚀 Поэтапный запуск по точкам, супервизия в первую неделю.',
+    9: '📢 Маркетинг на линии: ценники, комбо, обучение кассиров допродажам.',
+    10: '📈 Анализ продаж, списаний, маржи. Решение о судьбе блюда.'
+  };
+  steps.forEach(step => {
+    step.addEventListener('click', () => {
+      const stepNum = step.getAttribute('data-step');
+      if(stepNum && stepDetails[stepNum]) {
+        stepMsgDiv.innerHTML = `<i class="fas fa-info-circle"></i> Шаг ${stepNum}: ${stepDetails[stepNum]}`;
+      } else {
+        stepMsgDiv.innerHTML = `<i class="fas fa-hand-point-right"></i> Нажми на любой шаг, чтобы узнать подробнее`;
+      }
+    });
+  });
+
+  // Калькулятор экономики (слайд 6)
+  const costInput = document.getElementById('costPrice');
+  const priceInput = document.getElementById('sellPrice');
+  const marginRubSpan = document.getElementById('marginRub');
+  const marginPercentSpan = document.getElementById('marginPercent');
+  const foodCostSpan = document.getElementById('foodCostPercent');
+  function updateCalculator() {
+    let cost = parseFloat(costInput.value) || 0;
+    let price = parseFloat(priceInput.value) || 0;
+    if(price <= 0) price = 0;
+    let marginRub = price - cost;
+    if(marginRub < 0) marginRub = 0;
+    let marginPercent = price > 0 ? (marginRub / price) * 100 : 0;
+    let foodCost = price > 0 ? (cost / price) * 100 : 0;
+    marginRubSpan.innerText = marginRub.toFixed(0);
+    marginPercentSpan.innerText = marginPercent.toFixed(1) + '%';
+    foodCostSpan.innerText = foodCost.toFixed(1) + '%';
+  }
+  if(costInput && priceInput) {
+    costInput.addEventListener('input', updateCalculator);
+    priceInput.addEventListener('input', updateCalculator);
+    updateCalculator();
+  }
+
+  // ОТПРАВКА ЧЕК-ЛИСТА НА EMAIL через mailto:
+  const sendBtn = document.getElementById('sendReportBtn');
+  const sendMsgDiv = document.getElementById('sendMessage');
+  sendBtn.addEventListener('click', () => {
+    // собираем данные чек-листа
+    const checks = {
+      ttck: document.getElementById('ch1')?.checked || false,
+      economy: document.getElementById('ch2')?.checked || false,
+      kitchen: document.getElementById('ch3')?.checked || false,
+      suppliers: document.getElementById('ch4')?.checked || false,
+      pilot: document.getElementById('ch5')?.checked || false,
+      focusGroup: document.getElementById('chFocus')?.checked || false,
+      training: document.getElementById('ch6')?.checked || false,
+      marketing: document.getElementById('ch7')?.checked || false,
+      control: document.getElementById('ch8')?.checked || false
+    };
+    const comment = document.getElementById('checklistComment')?.value || 'Без комментария';
+    
+    // формируем текст письма
+    let body = "===== ОТЧЕТ ПО ЧЕК-ЛИСТУ ЗАПУСКА НОВОГО БЛЮДА =====\n\n";
+    body += "✅ Разработана ТТК: " + (checks.ttck ? "ДА" : "НЕТ") + "\n";
+    body += "💰 Экономика рассчитана (фудкост 25-30%): " + (checks.economy ? "ДА" : "НЕТ") + "\n";
+    body += "🏭 Адаптация под кухни: " + (checks.kitchen ? "ДА" : "НЕТ") + "\n";
+    body += "🚚 Поставщики (2+): " + (checks.suppliers ? "ДА" : "НЕТ") + "\n";
+    body += "🧪 Пилот проведён: " + (checks.pilot ? "ДА" : "НЕТ") + "\n";
+    body += "⭐ ФОКУС-ГРУППА (5 независимых человек): " + (checks.focusGroup ? "ПРОВЕДЕНА" : "НЕ ПРОВЕДЕНА") + "\n";
+    body += "👨‍🍳 Обучение персонала: " + (checks.training ? "ДА" : "НЕТ") + "\n";
+    body += "📢 Маркетинг готов: " + (checks.marketing ? "ДА" : "НЕТ") + "\n";
+    body += "📊 Назначен контроль: " + (checks.control ? "ДА" : "НЕТ") + "\n";
+    body += "\n📝 Комментарий: " + comment + "\n\n";
+    body += "--- Отправлено из интерактивной презентации ---";
+    
+    const subject = encodeURIComponent("Чек-лист запуска блюда (фокус-группа)");
+    const mailBody = encodeURIComponent(body);
+    const mailtoLink = `mailto:pirogi44@mail.ru?subject=${subject}&body=${mailBody}`;
+    
+    // открываем почтовый клиент
+    window.location.href = mailtoLink;
+    sendMsgDiv.innerHTML = '<i class="fas fa-check-circle"></i> Открыт почтовый клиент. Отправьте письмо на pirogi44@mail.ru (данные уже в теле).';
+    setTimeout(() => {
+      sendMsgDiv.innerHTML = '';
+    }, 5000);
+  });
+
+  updateSlides();
+</script>
+</body>
+</html>
